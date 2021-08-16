@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.movieapp">
    <application
-        android:label="movieapp"
-        android:icon="@mipmap/ic_launcher">
+        android:label="The Movie App"
+        android:icon="@mipmap/movie_icon">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

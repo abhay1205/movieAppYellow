@@ -98,7 +98,7 @@ class _AddFormState extends State<AddForm> {
                   front: Container(
                     alignment: Alignment.topCenter,
                     padding: EdgeInsets.all(5),
-                    height: ht * 0.7,
+                    height: ht * 0.8,
                     width: wt * 0.8,
                     child: Card(
                       shape: RoundedRectangleBorder(

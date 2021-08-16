@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:emojis/emojis.dart';
+import 'package:flip_card/flip_card.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,6 +10,7 @@ import 'package:movieapp/utils/colorplate.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:share/share.dart';
 
 class EditForm extends StatefulWidget {
   final Movie movie;
@@ -19,11 +22,11 @@ class EditForm extends StatefulWidget {
 class _EditFormState extends State<EditForm> {
   File _poster;
   final picker = ImagePicker();
-
+  Movie savedMovie;
   TextEditingController _nameTEC;
   TextEditingController _dnameTEC;
   TextEditingController _rating;
-
+  bool saved = false;
   bool keyboardOpen = false;
 
 
@@ -54,7 +57,7 @@ class _EditFormState extends State<EditForm> {
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
+  final cardKey = GlobalKey<FlipCardState>();
   @override
   void initState() {
     KeyboardVisibilityNotification().addNewListener(
@@ -90,23 +93,87 @@ class _EditFormState extends State<EditForm> {
                 //             width: wt * 0.4,
                 //             child: RotationTransition(
                 //               turns: AlwaysStoppedAnimation(30/ 360),
-                //               child: Image.asset('asset/img/movieicon.png', fit: BoxFit.contain,))),
-                Container(
-                  alignment: Alignment.topCenter,
-                  padding: EdgeInsets.all(5),
-                  height: ht * 0.7,
-                  width: wt * 0.8,
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    color: Colors.white,
-                    shadowColor: Colors.grey,
-                    elevation: 5,
-                    child: Center(
-                      child: form(ht, wt),
+                //  
+                //             child: Image.asset('asset/img/movieicon.png', fit: BoxFit.contain,))),
+                FlipCard(
+                  key: cardKey,
+                  flipOnTouch: false,
+                  direction: FlipDirection.HORIZONTAL,
+                  front: Container(
+                    alignment: Alignment.topCenter,
+                    padding: EdgeInsets.all(5),
+                    height: ht * 0.7,
+                    width: wt * 0.8,
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      color: Colors.white,
+                      shadowColor: Colors.grey,
+                      elevation: 5,
+                      child: Center(
+                        child: form(ht, wt),
+                      ),
+                    ),
+                  ),
+                  back: Container(
+                    alignment: Alignment.topCenter,
+                    padding: EdgeInsets.all(5),
+                    height: ht * 0.7,
+                    width: wt * 0.8,
+                    child: Card(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      color: Colors.white,
+                      shadowColor: Colors.grey,
+                      elevation: 5,
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Container(
+                                height: ht * 0.4,
+                                width: wt * 0.7,
+                                child: RotationTransition(
+                                    turns: AlwaysStoppedAnimation(338 / 360),
+                                    child: Image.asset(
+                                      'asset/img/movieicon.png',
+                                      fit: BoxFit.contain,
+                                    ))),
+                            Text('The Movie App',
+                                style: GoogleFonts.lato(
+                                    fontWeight: FontWeight.w600, fontSize: 25)),
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(25, 15, 20, 0),
+                              child: Text(
+                                  'Your movie is updated!!',
+                                  textAlign: TextAlign.center,
+                                  style: GoogleFonts.roboto(
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 17)),
+                            ),
+                            
+                            
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
+                // Container(
+                //   alignment: Alignment.topCenter,
+                //   padding: EdgeInsets.all(5),
+                //   height: ht * 0.7,
+                //   width: wt * 0.8,
+                //   child: Card(
+                //     shape: RoundedRectangleBorder(
+                //         borderRadius: BorderRadius.circular(10)),
+                //     color: Colors.white,
+                //     shadowColor: Colors.grey,
+                //     elevation: 5,
+                //     child: Center(
+                //       child: form(ht, wt),
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),
@@ -339,7 +406,8 @@ class _EditFormState extends State<EditForm> {
   }
 
   Widget floatingActionButton() {
-    return keyboardOpen?SizedBox():FloatingActionButton.extended(
+    return keyboardOpen?SizedBox():
+    saved?SizedBox():FloatingActionButton.extended(
       onPressed: () async {
         if (_formKey.currentState.validate()) {
           _formKey.currentState.save();
@@ -354,7 +422,19 @@ class _EditFormState extends State<EditForm> {
               rating: double.parse(_rating.text),
               created: DateTime.now());
 
-          await MovieDB.instance.update(movie).then((value) => print(value));
+          await MovieDB.instance.update(movie).then((value) {
+                      if (value != null) {
+                        cardKey.currentState.toggleCard();
+                       
+                        saved = true;
+                        setState(() {});
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text('Something went wrong'),
+                          backgroundColor: Colors.black,
+                        ));
+                      }
+                    });;
         }
         // Navigator.of(context).push(
         //     MaterialPageRoute(builder: (BuildContext context) => AddForm()));

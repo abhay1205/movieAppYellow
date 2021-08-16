@@ -34,9 +34,13 @@ dependencies:
   image_picker: ^0.8.3+2
   flutter_rating_bar: ^4.0.0
   sqflite: ^2.0.0+3
-  keyboard_visibility: ^0.5.6
+  keyboard_visibility: 
   share: ^2.0.4
   flip_card: ^0.5.0
+  cloud_firestore: 
+  firebase_auth: 
+  google_sign_in: 
+  shared_preferences: 
 
 dev_dependencies:
   flutter_test:
